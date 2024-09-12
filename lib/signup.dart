@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/Models/users.dart';
+import 'package:flutter_demo/SqliteFunc/sqlite.dart';
 import 'package:flutter_demo/signin.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -11,15 +13,13 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  //
-
   final username = TextEditingController();
   final password = TextEditingController();
   final confPassword = TextEditingController();
   final email = TextEditingController();
 
-  bool isVisible = false;
-  bool isconfVisible = false;
+  bool isVisible = true;
+  bool isconfVisible = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,6 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: [
                       TextFormField(
                         controller: username,
+                        style: const TextStyle(color: Colors.white),
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "username is required";
@@ -76,6 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       const SizedBox(height: 16.0),
                       TextFormField(
+                        style: const TextStyle(color: Colors.white),
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Email Address is required";
@@ -106,6 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       const SizedBox(height: 16.0),
                       TextFormField(
+                        style: const TextStyle(color: Colors.white),
                         controller: password,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -142,13 +145,11 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ),
                         obscureText: isVisible,
-                        onSaved: (passaword) {
-                          // Save it
-                        },
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: TextFormField(
+                          style: const TextStyle(color: Colors.white),
                           controller: confPassword,
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -188,9 +189,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                           obscureText: isconfVisible,
-                          onSaved: (passaword) {
-                            // Save it
-                          },
                         ),
                       ),
                       Padding(
@@ -198,7 +196,19 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
+                              final db = DatabaseHelper();
+
+                              db
+                                  .signup(Users(
+                                      username: username.text,
+                                      email: email.text,
+                                      password: password.text))
+                                  .whenComplete(() {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SignInScreen()));
+                              });
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -252,16 +262,3 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
-
-// only for demo
-List<DropdownMenuItem<String>>? countries = [
-  "Bangladesh",
-  "Switzerland",
-  'Canada',
-  'Japan',
-  'Germany',
-  'Australia',
-  'Sweden',
-].map<DropdownMenuItem<String>>((String value) {
-  return DropdownMenuItem<String>(value: value, child: Text(value));
-}).toList();

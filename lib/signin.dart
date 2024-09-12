@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/Models/users.dart';
+import 'package:flutter_demo/SqliteFunc/sqlite.dart';
+import 'package:flutter_demo/dashboard.dart';
 import 'package:flutter_demo/signup.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -10,11 +13,31 @@ class SignInScreen extends StatefulWidget {
 
 class _SigninState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool isLoginTrue = false;
 
   final username = TextEditingController();
   final password = TextEditingController();
 
-  bool isVisible = false;
+  bool isVisible = true;
+
+  final db = DatabaseHelper();
+
+  login() async {
+    var response = await db.login(
+        Users(username: username.text, email: "", password: password.text));
+    if (response == true) {
+      if (!mounted) {
+        return;
+      }
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Dashboard()));
+    } else {
+      setState(() {
+        isLoginTrue = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +68,7 @@ class _SigninState extends State<SignInScreen> {
                     child: Column(
                       children: [
                         TextFormField(
+                          controller: username,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "username is required";
@@ -81,6 +105,7 @@ class _SigninState extends State<SignInScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           child: TextFormField(
+                            controller: password,
                             validator: (value) {
                               if (value!.isEmpty) {
                                 return "password is required";
@@ -130,7 +155,7 @@ class _SigninState extends State<SignInScreen> {
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
+                              login();
                               // Navigate to the main screen
                             }
                           },
@@ -185,6 +210,12 @@ class _SigninState extends State<SignInScreen> {
                                 ),
                           ),
                         ),
+                        isLoginTrue
+                            ? const Text(
+                                "Username or Password is incorrect",
+                                style: TextStyle(color: Colors.red),
+                              )
+                            : const SizedBox()
                       ],
                     ),
                   ),
