@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/Models/users.dart';
-import 'package:flutter_demo/SqliteFunc/sqlite.dart';
-import 'package:flutter_demo/dashboard.dart';
-import 'package:flutter_demo/signup.dart';
+import 'package:Attendance_System/Models/users.dart';
+import 'package:Attendance_System/SqliteFunc/sqlite.dart';
+import 'package:Attendance_System/dashboard.dart';
+import 'package:Attendance_System/signup.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -30,7 +30,7 @@ class _SigninState extends State<SignInScreen> {
         return;
       }
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Dashboard()));
+          context, MaterialPageRoute(builder: (context) => const Dashboard()));
     } else {
       setState(() {
         isLoginTrue = true;
@@ -77,7 +77,7 @@ class _SigninState extends State<SignInScreen> {
                           },
                           style: const TextStyle(color: Colors.white),
                           decoration: const InputDecoration(
-                            label: const Text(
+                            label: Text(
                               "Username",
                               style: TextStyle(
                                   color: Color.fromARGB(122, 133, 133, 133),

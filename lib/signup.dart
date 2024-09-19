@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/Models/users.dart';
-import 'package:flutter_demo/SqliteFunc/sqlite.dart';
-import 'package:flutter_demo/signin.dart';
+import 'package:Attendance_System/Models/users.dart';
+import 'package:Attendance_System/SqliteFunc/sqlite.dart';
+import 'package:Attendance_System/signin.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -207,7 +207,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => SignInScreen()));
+                                        builder: (context) =>
+                                            const SignInScreen()));
                               });
                             }
                           },

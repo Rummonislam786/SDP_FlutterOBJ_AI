@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/Models/users.dart';
-import 'package:flutter_demo/SqliteFunc/sqlite.dart';
+import 'package:Attendance_System/Models/users.dart';
+import 'package:Attendance_System/SqliteFunc/sqlite.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+  const Dashboard({super.key});
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -40,7 +40,7 @@ class _DashboardState extends State<Dashboard> {
       appBar: AppBar(
         title: const Text("Dashboard"),
         elevation: 0,
-        backgroundColor: Color(0xff2D2E2F),
+        backgroundColor: const Color(0xff2D2E2F),
         foregroundColor: Colors.white,
       ),
       body: SafeArea(
