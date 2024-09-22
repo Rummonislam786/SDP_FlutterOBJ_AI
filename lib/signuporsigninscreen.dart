@@ -1,3 +1,5 @@
+import 'package:Attendance_System/signin.dart';
+import 'package:Attendance_System/signup.dart';
 import 'package:flutter/material.dart';
 
 class SigninOrSignupScreen extends StatelessWidget {
@@ -13,16 +15,24 @@ class SigninOrSignupScreen extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              Image.network(
-                MediaQuery.of(context).platformBrightness == Brightness.light
-                    ? "https://i.postimg.cc/nz0YBQcH/Logo-light.png"
-                    : "https://i.postimg.cc/MHH0DKv1/Logo-dark.png",
-                height: 146,
+              Image.asset(
+                "assets/logo3.png",
+                height: 250,
+              ),
+              Text(
+                "FACE EMOTION RECOGNITION",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: "Courier",
+                    fontWeight: FontWeight.w900),
               ),
               const Spacer(),
               ElevatedButton(
                 onPressed: () {
-                  
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignInScreen()));
                 },
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
@@ -35,7 +45,12 @@ class SigninOrSignupScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignupScreen()));
+                },
                 style: ElevatedButton.styleFrom(
                     elevation: 0,
                     foregroundColor: Colors.white,

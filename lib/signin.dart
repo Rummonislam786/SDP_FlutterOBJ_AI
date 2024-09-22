@@ -51,7 +51,7 @@ class _SigninState extends State<SignInScreen> {
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.1),
                   Image.asset(
-                    "assets/logo2.png",
+                    "assets/Login.png",
                     height: 100,
                   ),
                   SizedBox(height: constraints.maxHeight * 0.1),

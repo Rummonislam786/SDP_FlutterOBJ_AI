@@ -32,7 +32,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 SizedBox(height: constraints.maxHeight * 0.08),
                 Image.asset(
-                  "assets/logo2.png",
+                  "assets/Registration.png",
                   height: 100,
                 ),
                 SizedBox(height: constraints.maxHeight * 0.08),
