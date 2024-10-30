@@ -50,7 +50,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff151345),
+      backgroundColor: const Color.fromARGB(255, 165, 148, 249),
       appBar: AppBar(
         title: const Text("Dashboard"),
         elevation: 0,
@@ -67,9 +67,9 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 InkWell(
                   child: _buildMenuItem({
-                    "title": "Detect Emotion",
+                    "title": "Attendance",
                     "icon": Icons.camera,
-                    "color": Colors.blue
+                    "color": const Color.fromARGB(255, 8, 217, 214)
                   }),
                   onTap: () {
                     Navigator.push(
@@ -82,7 +82,7 @@ class _DashboardState extends State<Dashboard> {
                   child: _buildMenuItem({
                     "title": "Users",
                     "icon": Icons.person,
-                    "color": Colors.green
+                    "color": Color.fromARGB(255, 37, 42, 52)
                   }),
                   onTap: () {},
                 ),
@@ -90,7 +90,7 @@ class _DashboardState extends State<Dashboard> {
                   child: _buildMenuItem({
                     "title": "Configuration",
                     "icon": Icons.settings,
-                    "color": Colors.orange
+                    "color": Color.fromARGB(255, 255, 46, 98)
                   }),
                   onTap: () {},
                 ),
@@ -98,7 +98,7 @@ class _DashboardState extends State<Dashboard> {
                   child: _buildMenuItem({
                     "title": "About",
                     "icon": Icons.info,
-                    "color": Colors.purple
+                    "color": Color.fromARGB(255, 255, 157, 115)
                   }),
                   onTap: () {
                     Navigator.push(context,

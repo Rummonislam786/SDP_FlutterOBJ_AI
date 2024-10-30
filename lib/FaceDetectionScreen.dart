@@ -38,12 +38,7 @@ class _FaceDetectionScreenState extends State<FaceDetectionScreen> {
       newDescription = _availableCameras.firstWhere((description) =>
           description.lensDirection == CameraLensDirection.front);
     }
-
-    if (newDescription != null) {
-      _initCamera(newDescription);
-    } else {
-      print('Asked camera not available');
-    }
+    _initCamera(newDescription);
   }
 
   @override

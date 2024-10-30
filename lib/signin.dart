@@ -41,7 +41,7 @@ class _SigninState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff2d2e2f),
+      backgroundColor: const Color.fromARGB(255, 202, 240, 248),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -51,7 +51,7 @@ class _SigninState extends State<SignInScreen> {
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.1),
                   Image.asset(
-                    "assets/Login.png",
+                    "assets/logo.png",
                     height: 100,
                   ),
                   SizedBox(height: constraints.maxHeight * 0.1),
@@ -61,7 +61,7 @@ class _SigninState extends State<SignInScreen> {
                           .headlineSmall!
                           .copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white)),
+                              color: Colors.black)),
                   SizedBox(height: constraints.maxHeight * 0.05),
                   Form(
                     key: _formKey,
@@ -75,20 +75,20 @@ class _SigninState extends State<SignInScreen> {
                             }
                             return null;
                           },
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.black),
                           decoration: const InputDecoration(
                             label: Text(
                               "Username",
                               style: TextStyle(
-                                  color: Color.fromARGB(122, 133, 133, 133),
+                                  color: Color.fromARGB(121, 32, 31, 31),
                                   fontWeight: FontWeight.bold),
                             ),
                             prefixIcon: Icon(
                               Icons.person,
-                              color: Color(0xFFFEF200),
+                              color: Color(0xFF00BF6D),
                             ),
                             filled: true,
-                            fillColor: Color(0xff2d2e2f),
+                            fillColor: Color.fromARGB(255, 202, 240, 248),
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 16.0 * 1.5, vertical: 16.0),
                             border: OutlineInputBorder(
@@ -112,18 +112,18 @@ class _SigninState extends State<SignInScreen> {
                               }
                               return null;
                             },
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.black),
                             obscureText: isVisible,
                             decoration: InputDecoration(
                               label: const Text(
                                 "Password",
                                 style: TextStyle(
-                                    color: Color.fromARGB(122, 133, 133, 133),
+                                    color: Color.fromARGB(121, 32, 31, 31),
                                     fontWeight: FontWeight.bold),
                               ),
                               prefixIcon: const Icon(
                                 Icons.lock,
-                                color: Color(0xFFFEF200),
+                                color: Color(0xFF00BF6D),
                               ),
                               suffixIcon: IconButton(
                                   onPressed: () {
@@ -135,10 +135,11 @@ class _SigninState extends State<SignInScreen> {
                                     isVisible
                                         ? Icons.visibility_off
                                         : Icons.visibility,
-                                    color: const Color(0xFFFEF200),
+                                    color: Color(0xFF00BF6D),
                                   )),
                               filled: true,
-                              fillColor: const Color(0xff2d2e2f),
+                              fillColor:
+                                  const Color.fromARGB(255, 202, 240, 248),
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16.0 * 1.5, vertical: 16.0),
                               border: const OutlineInputBorder(
@@ -161,8 +162,8 @@ class _SigninState extends State<SignInScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             elevation: 0,
-                            backgroundColor: const Color(0xFFFEF200),
-                            foregroundColor: const Color(0xFF012924),
+                            backgroundColor: const Color(0xFF00BF6D),
+                            foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 48),
                             shape: const StadiumBorder(),
                           ),
@@ -176,7 +177,7 @@ class _SigninState extends State<SignInScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: Colors.white),
+                                .copyWith(color: Colors.black),
                           ),
                         ),
                         TextButton(
@@ -189,13 +190,15 @@ class _SigninState extends State<SignInScreen> {
                           },
                           child: Text.rich(
                             const TextSpan(
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.black),
                               text: "Don’t have an account? ",
                               children: [
                                 TextSpan(
-                                  text: "Sign Up",
-                                  style: TextStyle(color: Color(0xFFFEF200)),
-                                ),
+                                    text: "Sign Up",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromARGB(
+                                            255, 244, 151, 142))),
                               ],
                             ),
                             style: Theme.of(context)

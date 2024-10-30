@@ -8,7 +8,7 @@ class SigninOrSignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 202, 240, 248),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -16,11 +16,11 @@ class SigninOrSignupScreen extends StatelessWidget {
             children: [
               const Spacer(flex: 2),
               Image.asset(
-                "assets/logo3.png",
+                "assets/logo.png",
                 height: 250,
               ),
-              Text(
-                "FACE EMOTION RECOGNITION",
+              const Text(
+                "EMPLOYEE ATTENDANCE SYSTEM",
                 style: TextStyle(
                     fontSize: 20,
                     fontFamily: "Courier",
@@ -53,10 +53,10 @@ class SigninOrSignupScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                     elevation: 0,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     minimumSize: const Size(double.infinity, 48),
                     shape: const StadiumBorder(),
-                    backgroundColor: const Color(0xFFFE9901)),
+                    backgroundColor: const Color.fromARGB(255, 244, 151, 142)),
                 child: const Text("Sign Up"),
               ),
               const Spacer(flex: 2),
