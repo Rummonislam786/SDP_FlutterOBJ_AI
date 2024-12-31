@@ -1,28 +1,34 @@
-import 'package:Attendance_System/FaceDetectionScreen.dart';
+import 'package:Attendance_System/signinorsignupscreen.dart';
+import 'package:Attendance_System/splashscreen.dart';
 import 'package:flutter/material.dart';
-import 'package:Attendance_System/dashboard.dart';
-import 'package:Attendance_System/signup.dart';
-import 'package:Attendance_System/signin.dart';
-import 'package:Attendance_System/signuporsigninscreen.dart';
+import 'package:provider/provider.dart';
+import '/auth.dart';
+import '/login.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: const NoteMateApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class NoteMateApp extends StatelessWidget {
+  const NoteMateApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Note Mate',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SigninOrSignupScreen(),
+      home: const SplashScreen(),
     );
   }
 }
