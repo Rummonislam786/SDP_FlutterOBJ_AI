@@ -31,7 +31,7 @@ class Note {
   final int userId;
   final String title;
   final String content;
-  final String category;
+  final List<Tag> tags;
   final DateTime createdAt;
 
   Note({
@@ -39,7 +39,7 @@ class Note {
     required this.userId,
     required this.title,
     required this.content,
-    required this.category,
+    required this.tags,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -49,7 +49,6 @@ class Note {
       'user_id': userId,
       'title': title,
       'content': content,
-      'category': category,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -60,8 +59,32 @@ class Note {
       userId: map['user_id'],
       title: map['title'],
       content: map['content'],
-      category: map['category'],
+      tags: [], // Tags will be loaded separately
       createdAt: DateTime.parse(map['created_at']),
+    );
+  }
+}
+
+class Tag {
+  final int? id;
+  final String name;
+
+  Tag({
+    this.id,
+    required this.name,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+
+  factory Tag.fromMap(Map<String, dynamic> map) {
+    return Tag(
+      id: map['id'],
+      name: map['name'],
     );
   }
 }

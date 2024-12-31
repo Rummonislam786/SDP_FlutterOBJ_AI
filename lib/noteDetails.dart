@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../Models.dart';
 import '../databasehelper.dart';
@@ -21,17 +20,19 @@ class NoteDetailScreen extends StatefulWidget {
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
   late TextEditingController _titleController;
+  late TextEditingController _tagController;
   late quill.QuillController _contentController;
-  late String _selectedCategory;
+
+  List<Tag> _selectedTags = [];
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
+    // Initialize all controllers
     _titleController = TextEditingController(text: widget.note?.title ?? '');
-    _selectedCategory =
-        widget.note?.category ?? AppConstants.noteCategories.first;
+    _tagController = TextEditingController();
 
     // Initialize rich text editor
     if (widget.note != null && widget.note!.content.isNotEmpty) {
@@ -48,6 +49,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       }
     } else {
       _contentController = quill.QuillController.basic();
+    }
+
+    // Load existing tags if editing a note
+    if (widget.note != null) {
+      _loadExistingTags();
+    }
+  }
+
+  Future<void> _loadExistingTags() async {
+    if (widget.note?.id != null) {
+      final tags =
+          await DatabaseHelper.instance.getTagsForNote(widget.note!.id!);
+      setState(() {
+        _selectedTags = tags;
+      });
     }
   }
 
@@ -105,27 +121,97 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           jsonEncode(_contentController.document.toDelta().toJson());
 
       final note = Note(
-          id: widget.note?.id,
-          userId: widget.userId ?? widget.note!.userId,
-          title: _titleController.text.trim(),
-          content: contentJson,
-          category: _selectedCategory,
-          createdAt: widget.note?.createdAt);
+        id: widget.note?.id,
+        userId: widget.userId ?? widget.note!.userId,
+        title: _titleController.text.trim(),
+        content: contentJson,
+        tags: _selectedTags,
+        createdAt: widget.note?.createdAt,
+      );
 
-      if (widget.note == null) {
-        await DatabaseHelper.instance.insertNote(note);
-      } else {
-        await DatabaseHelper.instance.updateNote(note);
+      final db = DatabaseHelper.instance;
+
+      try {
+        if (widget.note == null) {
+          // For new notes
+          final savedNote = await db.insertNote(note);
+          // Add tags one by one
+          for (var tag in _selectedTags) {
+            await db.addTagToNote(savedNote.id!, tag.id!);
+          }
+        } else {
+          // For existing notes
+          await db.updateNote(note);
+          // Clear existing tag relations
+          await db.clearNoteTagsRelations(note.id!);
+          // Add new tag relations
+          for (var tag in _selectedTags) {
+            await db.addTagToNote(note.id!, tag.id!);
+          }
+        }
+
+        widget.onNoteUpdated();
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving note: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
-
-      widget.onNoteUpdated();
-      Navigator.of(context).pop();
     }
+  }
+
+  void _addTag() async {
+    if (_tagController.text.isEmpty) return;
+
+    final tagName = _tagController.text.trim();
+
+    // Check if tag already exists in selected tags
+    if (_selectedTags
+        .any((tag) => tag.name.toLowerCase() == tagName.toLowerCase())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tag already added')),
+      );
+      return;
+    }
+
+    try {
+      final tag = Tag(name: tagName);
+      final savedTag = await DatabaseHelper.instance.insertTag(tag);
+
+      setState(() {
+        _selectedTags.add(savedTag);
+        _tagController.clear();
+      });
+    } catch (e) {
+      // Handle case where tag already exists in database
+      final existingTags = await DatabaseHelper.instance.getAllTags();
+      final existingTag = existingTags.firstWhere(
+        (tag) => tag.name.toLowerCase() == tagName.toLowerCase(),
+        orElse: () => Tag(name: tagName),
+      );
+
+      if (!_selectedTags.contains(existingTag)) {
+        setState(() {
+          _selectedTags.add(existingTag);
+          _tagController.clear();
+        });
+      }
+    }
+  }
+
+  void _removeTag(Tag tag) {
+    setState(() {
+      _selectedTags.remove(tag);
+    });
   }
 
   @override
   void dispose() {
     _titleController.dispose();
+    _tagController.dispose();
     _contentController.dispose();
     super.dispose();
   }
@@ -133,7 +219,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(widget.note == null ? 'New Note' : 'Edit Note'),
         actions: [
@@ -166,52 +251,77 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       },
                     ),
                     const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      value: _selectedCategory,
-                      decoration: const InputDecoration(
-                        labelText: 'Category',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: AppConstants.noteCategories.map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategory = value!;
-                        });
-                      },
+
+                    // Tags Input Section
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _tagController,
+                            decoration: const InputDecoration(
+                              labelText: 'Add Tag',
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter a tag name',
+                            ),
+                            onSubmitted: (_) => _addTag(),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: _addTag,
+                        ),
+                      ],
                     ),
+
+                    if (_selectedTags.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: _selectedTags.map((tag) {
+                            return Chip(
+                              label: Text(tag.name),
+                              onDeleted: () => _removeTag(tag),
+                              deleteIcon: const Icon(Icons.close, size: 18),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
+
+            // QuillToolbar
             quill.QuillToolbar.simple(
-                controller: _contentController,
-                configurations: quill.QuillSimpleToolbarConfigurations(
-                    showSearchButton: false,
-                    showHeaderStyle: false,
-                    showQuote: false,
-                    showCodeBlock: false,
-                    showInlineCode: false,
-                    showColorButton: false,
-                    showBackgroundColorButton: false,
-                    showClearFormat: true,
-                    showListCheck: true,
-                    showIndent: true,
-                    toolbarSize: 20,
-                    customButtons: [
-                      quill.QuillToolbarCustomButtonOptions(
-                        onPressed: _insertImage,
-                        icon: const Icon(Icons.image),
-                      ),
-                      quill.QuillToolbarCustomButtonOptions(
-                        onPressed: _toggleCheckbox,
-                        icon: const Icon(Icons.check_box_outlined),
-                      ),
-                    ])),
+              controller: _contentController,
+              configurations: quill.QuillSimpleToolbarConfigurations(
+                showSearchButton: false,
+                showHeaderStyle: false,
+                showQuote: false,
+                showCodeBlock: false,
+                showInlineCode: false,
+                showColorButton: false,
+                showBackgroundColorButton: false,
+                showClearFormat: true,
+                showListCheck: true,
+                showIndent: true,
+                toolbarSize: 20,
+                customButtons: [
+                  quill.QuillToolbarCustomButtonOptions(
+                    onPressed: _insertImage,
+                    icon: const Icon(Icons.image),
+                  ),
+                  quill.QuillToolbarCustomButtonOptions(
+                    onPressed: _toggleCheckbox,
+                    icon: const Icon(Icons.check_box_outlined),
+                  ),
+                ],
+              ),
+            ),
+
+            // QuillEditor
             SizedBox(
               height: 400,
               child: Container(
@@ -219,8 +329,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 child: quill.QuillEditor.basic(
                   controller: _contentController,
                   configurations: const quill.QuillEditorConfigurations(
-                      checkBoxReadOnly: false,
-                      readOnlyMouseCursor: MouseCursor.defer),
+                    checkBoxReadOnly: false,
+                    readOnlyMouseCursor: MouseCursor.defer,
+                  ),
                 ),
               ),
             ),

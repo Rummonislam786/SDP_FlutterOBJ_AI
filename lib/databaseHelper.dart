@@ -16,6 +16,15 @@ class DatabaseHelper {
     return _database!;
   }
 
+  Future<void> clearNoteTagsRelations(int noteId) async {
+    final db = await database;
+    await db.delete(
+      'note_tags',
+      where: 'note_id = ?',
+      whereArgs: [noteId],
+    );
+  }
+
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
@@ -49,6 +58,94 @@ class DatabaseHelper {
         FOREIGN KEY (${AppConstants.noteUserIdColumn}) REFERENCES ${AppConstants.usersTable} (${AppConstants.userIdColumn})
       )
     ''');
+    // Create Tags Table
+    await db.execute('''
+      CREATE TABLE tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE
+      )
+    ''');
+
+    // Create Note-Tags relationship table
+    await db.execute('''
+      CREATE TABLE note_tags (
+        note_id INTEGER,
+        tag_id INTEGER,
+        PRIMARY KEY (note_id, tag_id),
+        FOREIGN KEY (note_id) REFERENCES ${AppConstants.notesTable} (${AppConstants.noteIdColumn}),
+        FOREIGN KEY (tag_id) REFERENCES tags (id)
+      )
+    ''');
+  }
+
+  // Tag operations
+  Future<Tag> insertTag(Tag tag) async {
+    final db = await database;
+    final id = await db.insert('tags', tag.toMap());
+    return Tag(id: id, name: tag.name);
+  }
+
+  Future<void> addTagToNote(int noteId, int tagId) async {
+    final db = await database;
+    try {
+      await db.insert('note_tags', {
+        'note_id': noteId,
+        'tag_id': tagId,
+      });
+    } catch (e) {
+      // If the relationship already exists, ignore the error
+      if (!e.toString().contains('UNIQUE constraint failed')) {
+        rethrow;
+      }
+    }
+  }
+
+  Future<List<Tag>> getTagsForNote(int noteId) async {
+    final db = await database;
+    final results = await db.rawQuery('''
+      SELECT t.* FROM tags t
+      INNER JOIN note_tags nt ON t.id = nt.tag_id
+      WHERE nt.note_id = ?
+    ''', [noteId]);
+    return results.map((map) => Tag.fromMap(map)).toList();
+  }
+
+  Future<List<Note>> getNotesByTags(int userId, List<String> tagNames) async {
+    final db = await database;
+    final questionMarks = List.filled(tagNames.length, '?').join(',');
+
+    final results = await db.rawQuery('''
+      SELECT DISTINCT n.* FROM ${AppConstants.notesTable} n
+      INNER JOIN note_tags nt ON n.${AppConstants.noteIdColumn} = nt.note_id
+      INNER JOIN tags t ON nt.tag_id = t.id
+      WHERE n.${AppConstants.noteUserIdColumn} = ?
+      AND t.name IN ($questionMarks)
+    ''', [userId, ...tagNames]);
+
+    final notes = results.map((map) => Note.fromMap(map)).toList();
+
+    // Load tags for each note
+    for (var note in notes) {
+      final tags = await getTagsForNote(note.id!);
+      note.tags.addAll(tags);
+    }
+
+    return notes;
+  }
+
+  Future<void> removeTagFromNote(int noteId, int tagId) async {
+    final db = await database;
+    await db.delete(
+      'note_tags',
+      where: 'note_id = ? AND tag_id = ?',
+      whereArgs: [noteId, tagId],
+    );
+  }
+
+  Future<List<Tag>> getAllTags() async {
+    final db = await database;
+    final results = await db.query('tags');
+    return results.map((map) => Tag.fromMap(map)).toList();
   }
 
   // User Operations
@@ -137,7 +234,7 @@ extension NoteCopyWith on Note {
       userId: userId,
       title: title,
       content: content,
-      category: category,
+      tags: tags,
       createdAt: createdAt,
     );
   }

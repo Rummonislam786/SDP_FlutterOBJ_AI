@@ -43,6 +43,10 @@ dependencies:
   provider: ^6.1.2
   flutter_quill: ^10.8.5
   image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  pdf: ^3.11.1
+  
+  speech_to_text: ^7.0.0
 
 dev_dependencies:
   flutter_test:
